@@ -1,11 +1,12 @@
+
+
 /***************************************************************/
 /************************Bibliotheques**************************/
 /***************************************************************/
-
-
 #include <avr/sleep.h>
 #include <avr/wdt.h>
 #include <avr/power.h>
+#include <Wire.h>
 #include <RTClib.h>
 #include "DHT.h"
 #include <SoftwareSerial.h>
@@ -344,7 +345,7 @@ Serial.println("#8");
     sigfox.println("AT$P=1\r");                         //Passage en mode sleep du modem Sigfox
     moy_pm10 = 0;
     moy_pm25 = 0;
-Serial.println("#9"); /
+Serial.println("#9"); 
     delay(2000);
   }
   else {
@@ -355,3 +356,4 @@ Serial.println("boucle moyenne");
     delais_transmi ++ ;
   }
 }
+
