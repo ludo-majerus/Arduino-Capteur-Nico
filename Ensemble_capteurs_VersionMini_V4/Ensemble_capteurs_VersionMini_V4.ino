@@ -287,27 +287,9 @@ Serial.println("######boucle envoie####");
     
     delais_transmi = 0;                                 //Reinitialise le compteur a zero
       
-Serial.println("#1");   
     sigfox.println("\r\n");                             //Reveil du modem Sigfox
-    //previousMillis = currentMillis; 
-
-    msg[0] = (int) moy_pm10;
-    msg[1] = (int) moy_pm25;
-    msg[2] = dht.readHumidity();
-    msg[3] = dht.readTemperature();
-Serial.print("moyenne PM10= ");
-Serial.println(msg[0]);
-Serial.print("moyenne PM2.5= ");
-Serial.println(msg[1]);
-Serial.print("Humidite= ");
-Serial.println(msg[2]);
-Serial.print("temperature= ");
-Serial.println(msg[3]);
-Serial.println("#2");
-    
-    char * message = convert(msg, 4);                   //Conversion du tableau d'octets
+  
     char * commandeSigfox = "";
-    
     commandeSigfox = prepareForSigfox(dht.readTemperature(), dht.readHumidity(), moy_pm10, moy_pm25);
     sigfox.write(commandeSigfox);                             //Envoi au modem de la commande
         
@@ -330,11 +312,10 @@ Serial.println("boucle moyenne");
   }
 }
 
-
 char * prepareForSigfox(int temperature, int humidity, int pm10, int pm25) {
   char dataString[50] = {0};
   sprintf(dataString, "AT$SF=%02X%02X%02X%02X\r",temperature, humidity, pm10, pm25);
   return dataString;
 }
 
-
+// Woohoo
