@@ -270,21 +270,6 @@ void veilleArduino ()
 }
 
 
-/* Fonction pour convertir un tableau d'octets en chaine hexadecimale */
-char * convert(uint8_t * buffer, size_t len) {
-  char * s = (char *) malloc(2 * len + 1);
-  char * p = s;
-  if( s ) {
-    while( len-- ) {
-      sprintf(p, "%02X", *buffer);
-      p += 2;
-      buffer++;
-    }
-  }
-  return s;
-}
-
-
 /* Envoi d'un message par Sigfox */
 void message_sigfox () 
 {
@@ -320,32 +305,20 @@ Serial.print("temperature= ");
 Serial.println(msg[3]);
 Serial.println("#2");
     
-    //string_sigfox = strcat( "AT$SF=" + String(msg[0], HEX));
-    //Serial.println(string_sigfox);
     char * message = convert(msg, 4);                   //Conversion du tableau d'octets
-    char * AT = (char * ) "AT$SF=";                     //Construction de la commande AT
-    char * commande = (char *) malloc(strlen(message) + strlen(AT) + (size_t) 1);
-Serial.println("#3");
-    strcpy(commande, AT);
-Serial.println("#4");
-    strcat(commande, message);
-Serial.println("#5");
-    strcat(commande, "\r");
-Serial.println(commande);                         //Affichage dans le moniteur du message envoyé
-    sigfox.write(commande);                             //Envoi au modem de la commande
-Serial.println("#6");
-    free(commande);                                     //Nettoyage de la commande pour gain de mémoire
-Serial.println("#7");
+    char * commandeSigfox = "";
+    
+    commandeSigfox = prepareForSigfox(dht.readTemperature(), dht.readHumidity(), moy_pm10, moy_pm25);
+    sigfox.write(commandeSigfox);                             //Envoi au modem de la commande
         
     if (sigfox.available()> 0)                        //Lecture de la réponse du modem Sigfox
     {
       Serial.println(sigfox.readStringUntil('\n'));
     }
-Serial.println("#8"); 
+
     sigfox.println("AT$P=1\r");                         //Passage en mode sleep du modem Sigfox
     moy_pm10 = 0;
     moy_pm25 = 0;
-Serial.println("#9"); 
     delay(2000);
   }
   else {
@@ -356,4 +329,12 @@ Serial.println("boucle moyenne");
     delais_transmi ++ ;
   }
 }
+
+
+char * prepareForSigfox(int temperature, int humidity, int pm10, int pm25) {
+  char dataString[50] = {0};
+  sprintf(dataString, "AT$SF=%02X%02X%02X%02X\r",temperature, humidity, pm10, pm25);
+  return dataString;
+}
+
 
